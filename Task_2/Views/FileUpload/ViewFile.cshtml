@@ -1,0 +1,173 @@
+﻿@model (List<Task_2.Models.AccountRecord>, List<Task_2.Models.TotalAccountRecord>, List<Task_2.Models.ClassAccountRecord>, List<string>, List<Task_2.Models.FileRecord>)
+@{
+    ViewData["Title"] = "File Contents";        //представление с таблицей содержимого файла
+}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            border: 3px solid #000;
+            padding: 8px;
+            text-align: center;
+            vertical-align: middle;
+            background-color: #fff;
+        }
+
+        td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: right;
+            vertical-align: middle;
+            background-color: #fff;
+        }
+
+        .header-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .bank-name {
+            text-align: left;
+            font-weight: normal;
+            font-size: 18px;
+        }
+
+        .report-title {
+            font-weight: bold;
+            font-size: 24px;
+            margin-top: 10px;
+        }
+
+        .report-period {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .report-type {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .date {
+            text-align: left;
+            font-size: 17px;
+            margin-top: 14px;
+            font-style: italic;
+        }
+
+        .currency {
+            text-align: right;
+            font-size: 17px;
+            margin-top: 14px;
+            font-style: italic;
+        }
+    </style>
+</head>
+
+<div class="header-container">
+    <div class="bank-name">@Model.Item5[0].BankName</div>
+    <div class="report-title">Оборотная ведомость по балансовым счетам</div>
+    <div class="report-period">@Model.Item5[0].Period</div>
+    <div class="report-type">по банку</div>
+</div>
+<div class="header-row">
+    <div class="date">@Model.Item5[0].Date</div>
+    <div class="currency">@Model.Item5[0].Currency</div>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th rowspan="2"><b>Б/cч</b></th>
+            <th colspan="2"><b>ВХОДЯЩЕЕ САЛЬДО</b></th>
+            <th colspan="2"><b>ОБОРОТ</b></th>
+            <th colspan="2"><b>ИСХОДЯЩЕЕ САЛЬДО</b></th>
+        </tr>
+        <tr>
+            <th><b>Актив</b></th>
+            <th><b>Пассив</b></th>
+            <th><b>Дебет</b></th>
+            <th><b>Кредит</b></th>
+            <th><b>Актив</b></th>
+            <th><b>Пассив</b></th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (int i = 1; i < 10; i++)
+        {
+            <tr>
+                <td style="text-align:center; border:3px solid #000" colspan="7">
+                    <b>
+                        @Model.Item4[i-1]
+                    </b>
+                </td>
+            </tr>
+            @for (int j = 10*i; j < 10*(i+1); j++)
+            {
+                @foreach (var account in Model.Item1)
+                {
+                    @if (account.AccountNumber / 100 == j)
+                    {
+                        <tr>
+                            <td style="text-align:left">@account.AccountNumber</td>
+                            <td>@account.ActiveIn.ToString("F2")</td>
+                            <td>@account.PassiveIn.ToString("F2")</td>
+                            <td>@account.Debet.ToString("F2")</td>
+                            <td>@account.Credit.ToString("F2")</td>
+                            <td>@account.ActiveOut.ToString("F2")</td>
+                            <td>@account.PassiveOut.ToString("F2")</td>
+                        </tr>
+                    }
+                }
+                @foreach (var totalAccount in Model.Item2.Where(acc => acc.AccountNumber == j))
+                {
+                    <tr>
+                        <td style="text-align:left"><b>@totalAccount.AccountNumber</b></td>
+                        <td><b>@totalAccount.ActiveIn.ToString("F2")</b></td>
+                        <td><b>@totalAccount.PassiveIn.ToString("F2")</b></td>
+                        <td><b>@totalAccount.Debet.ToString("F2")</b></td>
+                        <td><b>@totalAccount.Credit.ToString("F2")</b></td>
+                        <td><b>@totalAccount.ActiveOut.ToString("F2")</b></td>
+                        <td><b>@totalAccount.PassiveOut.ToString("F2")</b></td>
+                    </tr>
+                }
+            }
+            @foreach (var classAccount in Model.Item3.Where(acc => acc.AccountNumber == i))
+            {
+                <tr>
+                    <td style="text-align:left"><b>ПО КЛАССУ</b></td>
+                    <td><b>@classAccount.ActiveIn.ToString("F2")</b></td>
+                    <td><b>@classAccount.PassiveIn.ToString("F2")</b></td>
+                    <td><b>@classAccount.Debet.ToString("F2")</b></td>
+                    <td><b>@classAccount.Credit.ToString("F2")</b></td>
+                    <td><b>@classAccount.ActiveOut.ToString("F2")</b></td>
+                    <td><b>@classAccount.PassiveOut.ToString("F2")</b></td>
+                </tr>
+            }
+        }
+        @foreach (var classAccount in Model.Item3.Where(acc => acc.AccountNumber == 0))
+        {
+            <tr>
+                <td style="text-align:left"><b>БАЛАНС</b></td>
+                <td><b>@classAccount.ActiveIn.ToString("F2")</b></td>
+                <td><b>@classAccount.PassiveIn.ToString("F2")</b></td>
+                <td><b>@classAccount.Debet.ToString("F2")</b></td>
+                <td><b>@classAccount.Credit.ToString("F2")</b></td>
+                <td><b>@classAccount.ActiveOut.ToString("F2")</b></td>
+                <td><b>@classAccount.PassiveOut.ToString("F2")</b></td>
+            </tr>
+        }
+    </tbody>
+</table>
